@@ -59,6 +59,28 @@ class App extends Component {
     });
   };
 
+  dragStartHandler = (e, idx) => {
+    e.dataTransfer.setData('idx', idx);
+  };
+
+  dragOverHandler = (e) => {
+    e.preventDefault();
+    e.dataTransfer.dropEffect = 'move';
+  };
+
+  dropHandler = (e, newIdx) => {
+    e.preventDefault();
+    const oldIdx = e.dataTransfer.getData('idx');
+    const todos = this.state.todos.slice();
+    const todoItem = todos[oldIdx];
+    todos.splice(oldIdx, 1);
+    todos.splice(newIdx, 0, todoItem);
+    this.setState({
+      ...this.state,
+      todos,
+    });
+  };
+
   render() {
     return (
       <div className='App'>
@@ -74,20 +96,18 @@ class App extends Component {
           </form>
           <ul>
             {this.state.todos.map((todo, idx) => (
-              <li key={idx}>
+              <li
+                draggable
+                onDragStart={(e) => this.dragStartHandler(e, idx)}
+                onDragOver={(e) => this.dragOverHandler(e)}
+                onDrop={(e) => this.dropHandler(e, idx)}
+                key={idx}
+              >
                 {todo} <button onClick={() => this.editTodo(idx)}>Edit</button>{' '}
                 <button onClick={() => this.deleteTodo(idx)}>Delete</button>
               </li>
             ))}
           </ul>
-          <a
-            className='App-link'
-            href='https://reactjs.org'
-            target='_blank'
-            rel='noopener noreferrer'
-          >
-            Learn React
-          </a>
         </header>
       </div>
     );
